@@ -1,5 +1,6 @@
 import unittest
 
+from ciphers.affine import affine, reverse_affine
 from ciphers.caesar import caesar
 from ciphers.scytale import reverse_scytale, scytale
 
@@ -21,3 +22,11 @@ class TestCiphers(unittest.TestCase):
     def test_scytale_reverse(self):
         self.assertEqual(reverse_scytale("TpiproohasneniCrstis", 5), "TranspositionCiphers")
         self.assertEqual(reverse_scytale("Aersnne_cte_iGk_", 4), "AncientGreeks")
+
+    def test_affine(self):
+        self.assertEqual(affine("Hello World", 9, 5), "Qpaab Vbcag")
+        self.assertEqual(affine("Affine Cipher", 11, 7), "Hkkruz Drqgzm")
+
+    def test_affine_reverse(self):
+        self.assertEqual(reverse_affine("Qpaab Vbcag", 9, 5), "Hello World")
+        self.assertEqual(reverse_affine("Hkkruz Drqgzm", 11, 7), "Affine Cipher")
