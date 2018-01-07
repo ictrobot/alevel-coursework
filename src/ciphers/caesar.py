@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from ciphers.cipher import Cipher
+from cipher_window import CipherWindow
 from widgets.numentry import NumEntry
 
 
@@ -26,49 +26,45 @@ def caesar(text, shift):
     return output
 
 
-class CaesarCipher(Cipher):
-    """Base Cipher implementation for the Caesar Cipher"""
+class CaesarCipher(CipherWindow):
+    """Base Cipher Window for the Caesar Cipher"""
 
-    def __init__(self, mode):
-        super(CaesarCipher, self).__init__("Caesar Cipher - " + mode)
+    def __init__(self, application, mode):
+        super(CaesarCipher, self).__init__(application, "Caesar Cipher - " + mode)
         self.numentry_shift = None
 
-    def run(self, text):
-        """Run the cipher"""
-        shift = self.numentry_shift.get_num()
-        # if the number entry is empty, return a blank string
-        if shift is None:
-            return ""
-        return self.shift(text, shift)
+    def get_key(self):
+        """Returns the key or None if it is invalid"""
+        return self.numentry_shift.get_num()
 
-    def shift(self, text, shift):
-        """Actually perform the caesar cipher, overridden in subclasses"""
+    def run_cipher(self, text, key):
+        """Subclasses actually run the caesar cipher"""
         raise NotImplementedError()
 
-    def tk_options_frame(self, cipher_window):
+    def tk_key_frame(self):
         """Get the key input"""
-        frame = tk.Frame(cipher_window)
-        self.numentry_shift = NumEntry(frame, label="Shift: ", min=0, max=26, default=1, callback=cipher_window.update_output)
+        frame = tk.Frame(self)
+        self.numentry_shift = NumEntry(frame, label="Shift: ", min=0, max=26, default=1, callback=self.update_output)
         self.numentry_shift.grid(row=0, column=0)
         return frame
 
 
 class CaesarEncrypt(CaesarCipher):
-    """Caesar Encryption Cipher implementation"""
+    """Caesar Encryption Cipher Window"""
 
-    def __init__(self):
-        super(CaesarEncrypt, self).__init__("Encrypt")
+    def __init__(self, application):
+        super(CaesarEncrypt, self).__init__(application, "Encrypt")
 
-    def shift(self, text, shift):
+    def run_cipher(self, text, shift):
         return caesar(text, shift)
 
 
 class CaesarDecrypt(CaesarCipher):
-    """Caesar Decryption Cipher implementation"""
+    """Caesar Decryption Cipher Window"""
 
-    def __init__(self):
-        super(CaesarDecrypt, self).__init__("Decrypt")
+    def __init__(self, application):
+        super(CaesarDecrypt, self).__init__(application, "Decrypt")
 
-    def shift(self, text, shift):
+    def run_cipher(self, text, shift):
         # negative shift is the same as decryption
         return caesar(text, -shift)

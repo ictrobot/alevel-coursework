@@ -5,16 +5,16 @@ from utilities import TITLE_LABEL_OPTIONS, SUBTITLE_LABEL_OPTIONS
 
 class CipherWindow(tk.Frame):
 
-    def __init__(self, application, cipher):
+    def __init__(self, application, name):
         super(CipherWindow, self).__init__(application)
         self.application = application
-        self.cipher = cipher
+        self.name = name
 
         self.create_widgets()
 
     def create_widgets(self):
         """ Setup the widgets for the cipher window """
-        tk.Label(self, text=self.cipher.name, **TITLE_LABEL_OPTIONS).grid(row=0, column=0)
+        tk.Label(self, text=self.name, **TITLE_LABEL_OPTIONS).grid(row=0, column=0)
 
         tk.Label(self, text="Input", **SUBTITLE_LABEL_OPTIONS).grid(row=1, column=0)
         # setup input text box so the output is updated every time the input changes.
@@ -23,7 +23,7 @@ class CipherWindow(tk.Frame):
         self.text_input.bind("<<Modified>>", self.input_modified)
 
         # get key input from cipher
-        self.cipher.tk_options_frame(self).grid(row=3, column=0)
+        self.tk_key_frame().grid(row=3, column=0)
 
         # error label
         self.error_label = tk.Label(self, text="", fg="red")
@@ -53,21 +53,44 @@ class CipherWindow(tk.Frame):
         """Runs the cipher on the text in the input box and puts the result in the output box"""
         # first set the error label to be empty
         self.set_error("")
-        # try and run the cipher on the input text
-        text_in = self.text_input.get(1.0, tk.END).strip()
-        try:
-            text_out = self.cipher.run(text_in)
-        except ValueError as e:
-            # an error has happened, display it in the label
-            self.set_error(str(e))
-            text_out = ""
+        # get the input text and key
+        input_text = self.get_input_text()
+        key = self.get_key()
+        if key is None:
+            # if the key is invalid
+            output_text = ""
+        else:
+            # try and run the cipher on the input text
+            try:
+                output_text = self.run_cipher(input_text, key)
+            except ValueError as e:
+                # an error has happened, display it in the label
+                self.set_error(str(e))
+                output_text = ""
 
         # to set text you must first set it so it is editable, then delete all the old text, insert the new text and then disable editing again.
         self.output_text.configure(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)
-        self.output_text.insert(tk.END, text_out)
+        self.output_text.insert(tk.END, output_text)
         self.output_text.configure(state=tk.DISABLED)
 
     def set_error(self, text):
         """Sets the error label to the text provided"""
         self.error_label["text"] = text
+
+    def get_input_text(self):
+        """Get the input text"""
+        return self.text_input.get(1.0, tk.END).strip()
+
+    # The below methods are designed to be overridden by cipher implementations
+    def get_key(self):
+        """Returns the key to be used for the cipher, or none if it is invalid"""
+        return None
+
+    def run_cipher(self, text, key):
+        """Run the cipher on the text and return the output"""
+        raise NotImplementedError()
+
+    def tk_key_frame(self):
+        """Returns the tkinter frame with the key inputs for the cipher"""
+        raise NotImplementedError()

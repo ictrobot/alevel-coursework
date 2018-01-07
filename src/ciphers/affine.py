@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from ciphers.cipher import Cipher
+from cipher_window import CipherWindow
 from utilities import greatest_common_divisor, mod_inverse
 from widgets.numentry import NumEntry
 
@@ -50,62 +50,57 @@ def reverse_affine(text, a, b):
     return output
 
 
-class AffineCipher(Cipher):
-    """Base Cipher implementation for the Affine Cipher"""
+class AffineCipher(CipherWindow):
+    """Base Cipher Window for the Affine Cipher"""
 
-    def __init__(self, mode):
-        super(AffineCipher, self).__init__("Affine Cipher - " + mode)
+    def __init__(self, application, mode):
+        super(AffineCipher, self).__init__(application, "Affine Cipher - " + mode)
         self.numentry_a = None
         self.numentry_b = None
 
-    def run(self, text):
-        """Run the cipher"""
+    def get_key(self):
+        """Returns the key or None if it is invalid"""
         a = self.numentry_a.get_num()
         b = self.numentry_b.get_num()
-        # if the number entry is empty, return a blank string
         if a is None or b is None:
-            return ""
-        return self.shift(text, a, b)
+            return None
+        return a, b
 
-    def shift(self, text, a, b):
-        """Actually perform the affine cipher, overridden in subclasses"""
+    def run_cipher(self, text, key):
+        """Subclasses actually run the affine cipher"""
         raise NotImplementedError()
 
-    def tk_options_frame(self, cipher_window):
+    def tk_key_frame(self):
         """Get the key input"""
-        frame = tk.Frame(cipher_window)
-        self.numentry_a = NumEntry(frame, label="A: ", min=0, max=26, default=1, callback=cipher_window.update_output)
+        frame = tk.Frame(self)
+        self.numentry_a = NumEntry(frame, label="A: ", min=0, max=26, default=1, callback=self.update_output)
         self.numentry_a.grid(row=0, column=0)
-        self.numentry_b = NumEntry(frame, label="B: ", min=0, max=26, default=1, callback=cipher_window.update_output)
+        self.numentry_b = NumEntry(frame, label="B: ", min=0, max=26, default=1, callback=self.update_output)
         self.numentry_b.grid(row=0, column=1)
         return frame
 
 
 class AffineEncrypt(AffineCipher):
-    """Affine Encryption Cipher implementation"""
+    """Affine Encryption Cipher Window"""
 
-    def __init__(self):
-        super(AffineEncrypt, self).__init__("Encrypt")
+    def __init__(self,  application):
+        super(AffineEncrypt, self).__init__( application, "Encrypt")
 
-    def tk_options_frame(self, cipher_window):
-        # store the cipher window so the error message can be set in the shift function
-        self.cipher_window = cipher_window
-        # call the super method
-        return super(AffineEncrypt, self).tk_options_frame(cipher_window)
-
-    def shift(self, text, a, b):
+    def run_cipher(self, text, key):
+        a, b = key
         if greatest_common_divisor(a, 26) != 1:
             # display a warning that it is impossible to decrypt the cipher text
-            self.cipher_window.set_error("Warning: cannot be decrypted as A and 26 are not co-prime")
+            self.set_error("Warning: cannot be decrypted as A and 26 are not co-prime")
         return affine(text, a, b)
 
 
 class AffineDecrypt(AffineCipher):
-    """Affine Decryption Cipher implementation"""
+    """Affine Decryption Cipher Window"""
 
-    def __init__(self):
-        super(AffineDecrypt, self).__init__("Decrypt")
+    def __init__(self,  application):
+        super(AffineDecrypt, self).__init__( application,"Decrypt")
 
-    def shift(self, text, a, b):
+    def run_cipher(self, text, key):
+        a, b = key
         # negative shift is the same as decryption
         return reverse_affine(text, a, b)
