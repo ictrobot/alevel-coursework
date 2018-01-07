@@ -1,6 +1,8 @@
 import tkinter as tk
 
-from utilities import TITLE_LABEL_OPTIONS, SUBTITLE_LABEL_OPTIONS
+from cipher_window import CipherWindow
+from ciphers.caesar import CaesarDecrypt, CaesarEncrypt
+from utilities import SUBTITLE_LABEL_OPTIONS, TITLE_LABEL_OPTIONS
 
 
 class MainMenu(tk.Frame):
@@ -16,8 +18,18 @@ class MainMenu(tk.Frame):
         tk.Label(self, text="Simple Substitution Ciphers", **SUBTITLE_LABEL_OPTIONS).grid(row=1, sticky="NW")
 
         tk.Label(self, text="Caesar Cipher").grid(row=2, sticky="NW")
-        tk.Button(self, text="Encrypt", command=lambda: None).grid(row=2, sticky="NESW", column=1)
-        tk.Button(self, text="Decrypt", command=lambda: None).grid(row=2, sticky="NESW", column=2)
+        tk.Button(self, text="Encrypt", command=lambda: self.show_cipher(CaesarEncrypt)).grid(row=2, sticky="NESW", column=1)
+        tk.Button(self, text="Decrypt", command=lambda: self.show_cipher(CaesarDecrypt)).grid(row=2, sticky="NESW", column=2)
+
+    def show_cipher(self, cipher_class):
+        """Display the cipher window"""
+        cipher_instance = cipher_class()
+        new_root = tk.Tk()
+        CipherWindow(new_root, cipher_instance).pack()
+        # destroy main menu
+        self.master.destroy()
+        # run new window
+        new_root.mainloop()
 
 
 if __name__ == "__main__":
