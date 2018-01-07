@@ -37,28 +37,46 @@ class MainMenu(tk.Frame):
     def __init__(self, application):
         super().__init__(application)
         self.application = application
+        self.next_row = 1
         self.create_widgets()
+
+    def create_subtitle(self, text):
+        """Helper function to simplify the creation of subtitles"""
+        # make the subtitle
+        tk.Label(self, text=text, **SUBTITLE_LABEL_OPTIONS).grid(row=self.next_row, sticky="NW")
+        # increment the next_row variable so the next item goes on the next row
+        self.next_row += 1
+
+    def create_cipher_entry(self, cipher_name, cipher_encrypt, cipher_decrypt):
+        """Helper function to simplify the creation of cipher entries"""
+        # add label with the cipher's name
+        tk.Label(self, text=cipher_name).grid(row=self.next_row, column=0, sticky="NW")
+
+        # setup the encrypt button
+        def encrypt_command():
+            self.application.show(CipherWindow, cipher_encrypt)
+        encrypt_button = tk.Button(self, text="Encrypt", command=encrypt_command)
+        encrypt_button.grid(row=self.next_row, column=1, sticky="NESW")
+
+        # setup the decrypt button
+        def decrypt_command():
+            self.application.show(CipherWindow, cipher_decrypt)
+        decrypt_button = tk.Button(self, text="Decrypt", command=decrypt_command)
+        decrypt_button.grid(row=self.next_row, column=2, sticky="NESW")
+        # increment the next_row variable so the next item goes on the next row
+        self.next_row += 1
 
     def create_widgets(self):
         """ Setup the widgets for the main menu """
 
         tk.Label(self, text="Ciphers", **TITLE_LABEL_OPTIONS).grid(row=0, sticky="NW")
 
-        tk.Label(self, text="Simple Substitution Ciphers", **SUBTITLE_LABEL_OPTIONS).grid(row=1, sticky="NW")
+        self.create_subtitle("Simple Substitution Ciphers")
+        self.create_cipher_entry("Caesar Cipher", CaesarEncrypt(), CaesarDecrypt())
+        self.create_cipher_entry("Affine Cipher", AffineEncrypt(), AffineDecrypt())
 
-        tk.Label(self, text="Caesar Cipher").grid(row=2, sticky="NW")
-        tk.Button(self, text="Encrypt", command=lambda: self.application.show(CipherWindow, CaesarEncrypt())).grid(row=2, sticky="NESW", column=1)
-        tk.Button(self, text="Decrypt", command=lambda: self.application.show(CipherWindow, CaesarDecrypt())).grid(row=2, sticky="NESW", column=2)
-
-        tk.Label(self, text="Affine Cipher").grid(row=3, sticky="NW")
-        tk.Button(self, text="Encrypt", command=lambda: self.application.show(CipherWindow, AffineEncrypt())).grid(row=3, sticky="NESW", column=1)
-        tk.Button(self, text="Decrypt", command=lambda: self.application.show(CipherWindow, AffineDecrypt())).grid(row=3, sticky="NESW", column=2)
-
-        tk.Label(self, text="Transposition Ciphers", **SUBTITLE_LABEL_OPTIONS).grid(row=4, sticky="NW")
-
-        tk.Label(self, text="Scytale Cipher").grid(row=5, sticky="NW")
-        tk.Button(self, text="Encrypt", command=lambda: self.application.show(CipherWindow, ScytaleEncrypt())).grid(row=5, sticky="NESW", column=1)
-        tk.Button(self, text="Decrypt", command=lambda: self.application.show(CipherWindow, ScytaleDecrypt())).grid(row=5, sticky="NESW", column=2)
+        self.create_subtitle("Transposition Ciphers")
+        self.create_cipher_entry("Scytale Cipher", ScytaleEncrypt(), ScytaleDecrypt())
 
 
 if __name__ == "__main__":
