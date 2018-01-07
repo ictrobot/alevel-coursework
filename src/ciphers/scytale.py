@@ -46,7 +46,7 @@ class ScytaleCipher(Cipher):
     def tk_options_frame(self, cipher_window):
         """Get the key input"""
         frame = tk.Frame(cipher_window)
-        self.numentry_columns = NumEntry(frame, label="Columns: ", min=0, default=1, callback=cipher_window.update_output)
+        self.numentry_columns = NumEntry(frame, label="Columns: ", min=1, default=1, callback=cipher_window.update_output)
         self.numentry_columns.grid(row=0, column=0)
         return frame
 
