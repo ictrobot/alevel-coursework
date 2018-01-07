@@ -2,6 +2,7 @@ import tkinter as tk
 
 from cipher_window import CipherWindow
 from ciphers.caesar import CaesarDecrypt, CaesarEncrypt
+from ciphers.scytale import ScytaleDecrypt, ScytaleEncrypt
 from utilities import SUBTITLE_LABEL_OPTIONS, TITLE_LABEL_OPTIONS
 
 
@@ -47,6 +48,12 @@ class MainMenu(tk.Frame):
         tk.Label(self, text="Caesar Cipher").grid(row=2, sticky="NW")
         tk.Button(self, text="Encrypt", command=lambda: self.application.show(CipherWindow, CaesarEncrypt())).grid(row=2, sticky="NESW", column=1)
         tk.Button(self, text="Decrypt", command=lambda: self.application.show(CipherWindow, CaesarDecrypt())).grid(row=2, sticky="NESW", column=2)
+
+        tk.Label(self, text="Transposition Ciphers", **SUBTITLE_LABEL_OPTIONS).grid(row=3, sticky="NW")
+
+        tk.Label(self, text="Scytale Cipher").grid(row=4, sticky="NW")
+        tk.Button(self, text="Encrypt", command=lambda: self.application.show(CipherWindow, ScytaleEncrypt())).grid(row=4, sticky="NESW", column=1)
+        tk.Button(self, text="Decrypt", command=lambda: self.application.show(CipherWindow, ScytaleDecrypt())).grid(row=4, sticky="NESW", column=2)
 
 
 if __name__ == "__main__":
