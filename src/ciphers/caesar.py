@@ -30,8 +30,9 @@ class CaesarCipher(CipherWindow):
     """Base Cipher Window for the Caesar Cipher"""
 
     def __init__(self, application, mode):
-        super(CaesarCipher, self).__init__(application, "Caesar Cipher - " + mode)
         self.numentry_shift = None
+
+        super(CaesarCipher, self).__init__(application, "Caesar Cipher - " + mode)
 
     def get_key(self):
         """Returns the key or None if it is invalid"""

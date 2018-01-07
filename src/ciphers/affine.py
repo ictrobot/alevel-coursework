@@ -54,9 +54,10 @@ class AffineCipher(CipherWindow):
     """Base Cipher Window for the Affine Cipher"""
 
     def __init__(self, application, mode):
-        super(AffineCipher, self).__init__(application, "Affine Cipher - " + mode)
         self.numentry_a = None
         self.numentry_b = None
+
+        super(AffineCipher, self).__init__(application, "Affine Cipher - " + mode)
 
     def get_key(self):
         """Returns the key or None if it is invalid"""
