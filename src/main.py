@@ -15,6 +15,10 @@ class Application(tk.Tk):
         self.resizable(0, 0)
         self.frame = None
         # When first opened, display the Main Menu
+        self.show_main_menu()
+
+    def show_main_menu(self):
+        """ Shows the main menu. Avoids circular imports """
         self.show(MainMenu)
 
     def show(self, frame_class=None, *args, **kwargs):
