@@ -1,12 +1,14 @@
 import tkinter as tk
 
 from utilities import TITLE_LABEL_OPTIONS, SUBTITLE_LABEL_OPTIONS
+from main import MainMenu
 
 
 class CipherWindow(tk.Frame):
 
-    def __init__(self, master, cipher):
-        super(CipherWindow, self).__init__(master)
+    def __init__(self, application, cipher):
+        super(CipherWindow, self).__init__(application)
+        self.application = application
         self.cipher = cipher
 
         self.create_widgets()
@@ -28,6 +30,9 @@ class CipherWindow(tk.Frame):
         # setup output text box which cannot be edited.
         self.output_text = tk.Text(self, height=7, width=80, wrap=tk.WORD, state=tk.DISABLED)
         self.output_text.grid(row=5, column=0, sticky="NSEW")
+
+        # back button
+        tk.Button(self, text="Back", command=lambda: self.application.show(MainMenu)).grid(row=0, column=1, sticky="NE")
 
         # when expanding the height of the window, expand the size of the text boxes.
         self.grid_rowconfigure(2, weight=1)
