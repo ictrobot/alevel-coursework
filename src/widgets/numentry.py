@@ -44,6 +44,24 @@ class NumEntry(tk.Frame):
         # allow as it must be an int in range
         return True
 
+    def set_max(self, max):
+        """Update the maximum number"""
+        self.max = max
+        if max is not None and self.get_num() is not None and self.get_num() > max:
+            # the current number is greater than the new maximum, so update the stored number
+            self.stringvar.set(str(max))
+            if self.callback:
+                self.callback()
+
+    def set_min(self, min):
+        """Update the minimum number"""
+        self.min = min
+        if min is not None and self.get_num() is not None and self.get_num() < min:
+            # the current number is smaller than the new minimum, so update the stored number
+            self.stringvar.set(str(min))
+            if self.callback:
+                self.callback()
+
     def get_num(self, empty=None):
         """Get the number entered"""
         text = self.stringvar.get()

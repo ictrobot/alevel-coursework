@@ -30,6 +30,9 @@ class ScytaleCipher(Cipher):
 
     def run(self, text):
         """Run the cipher"""
+        # update the maximum number of columns
+        self.numentry_columns.set_max(len(text))
+        # get the current number of columns
         columns = self.numentry_columns.get_num()
         # if the number entry is empty, return a blank string
         if columns is None:
