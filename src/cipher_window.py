@@ -25,17 +25,21 @@ class CipherWindow(tk.Frame):
         # get key input from cipher
         self.cipher.tk_options_frame(self).grid(row=3, column=0)
 
-        tk.Label(self, text="Output", **SUBTITLE_LABEL_OPTIONS).grid(row=4, column=0)
+        # error label
+        self.error_label = tk.Label(self, text="", fg="red")
+        self.error_label.grid(row=4, column=0)
+
+        tk.Label(self, text="Output", **SUBTITLE_LABEL_OPTIONS).grid(row=5, column=0)
         # setup output text box which cannot be edited.
         self.output_text = tk.Text(self, height=7, width=80, wrap=tk.WORD, state=tk.DISABLED)
-        self.output_text.grid(row=5, column=0, sticky="NSEW")
+        self.output_text.grid(row=6, column=0, sticky="NSEW")
 
         # back button
         tk.Button(self, text="Back", command=lambda: self.application.show_main_menu()).grid(row=0, column=1, sticky="NE")
 
         # when expanding the height of the window, expand the size of the text boxes.
         self.grid_rowconfigure(2, weight=1)
-        self.grid_rowconfigure(5, weight=1)
+        self.grid_rowconfigure(6, weight=1)
         # when expanding the width of the window, expand the main column
         self.grid_columnconfigure(0, weight=1)
 
@@ -47,11 +51,23 @@ class CipherWindow(tk.Frame):
 
     def update_output(self):
         """Runs the cipher on the text in the input box and puts the result in the output box"""
+        # first set the error label to be empty
+        self.set_error("")
+        # try and run the cipher on the input text
         text_in = self.text_input.get(1.0, tk.END).strip()
-        text_out = self.cipher.run(text_in)
+        try:
+            text_out = self.cipher.run(text_in)
+        except ValueError as e:
+            # an error has happened, display it in the label
+            self.set_error(str(e))
+            text_out = ""
 
         # to set text you must first set it so it is editable, then delete all the old text, insert the new text and then disable editing again.
         self.output_text.configure(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)
         self.output_text.insert(tk.END, text_out)
         self.output_text.configure(state=tk.DISABLED)
+
+    def set_error(self, text):
+        """Sets the error label to the text provided"""
+        self.error_label["text"] = text
