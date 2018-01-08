@@ -1,6 +1,7 @@
 import tkinter as tk
 
-from utilities import TITLE_LABEL_OPTIONS, SUBTITLE_LABEL_OPTIONS
+from utilities import SUBTITLE_LABEL_OPTIONS, TITLE_LABEL_OPTIONS
+from widgets.outputtext import OutputText
 
 
 class CipherWindow(tk.Frame):
@@ -31,7 +32,7 @@ class CipherWindow(tk.Frame):
 
         tk.Label(self, text="Output", **SUBTITLE_LABEL_OPTIONS).grid(row=5, column=0)
         # setup output text box which cannot be edited.
-        self.output_text = tk.Text(self, height=7, width=80, wrap=tk.WORD, state=tk.DISABLED)
+        self.output_text = OutputText(self, height=7, width=80, wrap=tk.WORD)
         self.output_text.grid(row=6, column=0, sticky="NSEW")
 
         # back button
@@ -67,12 +68,8 @@ class CipherWindow(tk.Frame):
                 # an error has happened, display it in the label
                 self.set_error(str(e))
                 output_text = ""
-
-        # to set text you must first set it so it is editable, then delete all the old text, insert the new text and then disable editing again.
-        self.output_text.configure(state=tk.NORMAL)
-        self.output_text.delete(1.0, tk.END)
-        self.output_text.insert(tk.END, output_text)
-        self.output_text.configure(state=tk.DISABLED)
+        # update the output text box with the new output text
+        self.output_text.set_text(output_text)
 
     def set_error(self, text):
         """Sets the error label to the text provided"""
