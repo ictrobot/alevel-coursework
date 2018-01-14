@@ -3,6 +3,7 @@ import unittest
 from ciphers.affine import affine, reverse_affine
 from ciphers.caesar import caesar
 from ciphers.scytale import reverse_scytale, scytale
+from ciphers.vigenere import vigenere, string_to_shifts, reverse_vigenere
 
 
 class TestCiphers(unittest.TestCase):
@@ -30,3 +31,18 @@ class TestCiphers(unittest.TestCase):
     def test_affine_reverse(self):
         self.assertEqual(reverse_affine("Qpaab Vbcag", 9, 5), "Hello World")
         self.assertEqual(reverse_affine("Hkkruz Drqgzm", 11, 7), "Affine Cipher")
+
+    def test_vigenere(self):
+        self.assertEqual(vigenere("Attack at dawn", [11, 4, 12, 14, 13]), "Lxfopv ef rnhr")
+        self.assertEqual(vigenere("Interwoven Caesar ciphers", [21, 8, 6, 4, 13, 4, 17, 4]), "Dvzieafzzv Ierwrv xqvlrvj")
+
+        with self.assertRaises(ValueError) as context:
+            vigenere("No shifts", [])
+
+    def test_reverse_vigenere(self):
+        self.assertEqual(reverse_vigenere("Lxfopv ef rnhr", [11, 4, 12, 14, 13]), "Attack at dawn")
+        self.assertEqual(reverse_vigenere("Dvzieafzzv Ierwrv xqvlrvj", [21, 8, 6, 4, 13, 4, 17, 4]), "Interwoven Caesar ciphers")
+
+    def test_string_to_shifts(self):
+        self.assertEqual(string_to_shifts("Lemon"), [11, 4, 12, 14, 13])
+        self.assertEqual(string_to_shifts("Vigenere"), [21, 8, 6, 4, 13, 4, 17, 4])
