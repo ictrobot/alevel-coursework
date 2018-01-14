@@ -3,6 +3,7 @@ import tkinter as tk
 from ciphers.affine import AffineDecrypt, AffineEncrypt
 from ciphers.caesar import CaesarDecrypt, CaesarEncrypt
 from ciphers.scytale import ScytaleDecrypt, ScytaleEncrypt
+from ciphers.vigenere import VigenereEncrypt, VigenereDecrypt
 from utilities import SUBTITLE_LABEL_OPTIONS, TITLE_LABEL_OPTIONS
 
 
@@ -73,6 +74,9 @@ class MainMenu(tk.Frame):
         self.create_subtitle("Simple Substitution Ciphers")
         self.create_cipher_entry("Caesar Cipher", CaesarEncrypt, CaesarDecrypt)
         self.create_cipher_entry("Affine Cipher", AffineEncrypt, AffineDecrypt)
+
+        self.create_subtitle("Polyalphabetic Substitution Ciphers")
+        self.create_cipher_entry("Vigenère Cipher", VigenereEncrypt, VigenereDecrypt)
 
         self.create_subtitle("Transposition Ciphers")
         self.create_cipher_entry("Scytale Cipher", ScytaleEncrypt, ScytaleDecrypt)

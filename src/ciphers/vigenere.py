@@ -1,3 +1,7 @@
+import tkinter as tk
+from cipher_window import CipherWindow
+
+
 def string_to_shifts(text):
     """Converts a string representing the shifts of a Vigenère cipher into a list
     of the shifts. e.g. ABC -> [1, 2, 3] """
@@ -45,3 +49,64 @@ def vigenere(text, shifts):
 def reverse_vigenere(text, shifts):
     """Reverses the Vigenère cipher by making all the shifts negative."""
     return vigenere(text, [-shift for shift in shifts])
+
+
+def valid_key(text):
+    """Returns if the text is a valid encryption/decryption key"""
+    for letter in text:
+        chr_code = ord(letter)
+        if not (65 <= chr_code <= 90 or 97 <= chr_code <= 122):
+            # if the character is not an uppercase or lowercase letter, invalid key
+            return False
+    # all uppercase or lowercase letters, so valid key
+    return True
+
+
+class VigenereCipher(CipherWindow):
+    """Base Cipher Window for the Vigenère Cipher"""
+
+    def __init__(self, application, mode):
+        self.stringvar_entry = None
+
+        super(VigenereCipher, self).__init__(application, "Vigenère Cipher - " + mode)
+
+    def get_key(self):
+        """Returns the key or None if it is invalid"""
+        key = self.stringvar_entry.get()
+        if len(key) > 0 and valid_key(key):
+            return key
+
+    def run_cipher(self, text, key):
+        """Subclasses actually run the Vigenère cipher"""
+        raise NotImplementedError()
+
+    def tk_key_frame(self):
+        """Get the key input"""
+        frame = tk.Frame(self)
+        tk.Label(frame, text="Key: ").grid(row=0, column=0)
+        self.stringvar_entry = tk.StringVar(frame)
+        self.stringvar_entry.trace("w", lambda *args: self.update_output())
+        tk.Entry(frame, validate="key", validatecommand=(frame.register(valid_key), "%P"), textvariable=self.stringvar_entry).grid(row=0, column=1)
+        return frame
+
+
+class VigenereEncrypt(VigenereCipher):
+    """Vigenère Encryption Cipher Window"""
+
+    def __init__(self, application):
+        super(VigenereEncrypt, self).__init__(application, "Encrypt")
+
+    def run_cipher(self, text, key):
+        shifts = string_to_shifts(key)
+        return vigenere(text, shifts)
+
+
+class VigenereDecrypt(VigenereCipher):
+    """Vigenère Decryption Cipher Window"""
+
+    def __init__(self, application):
+        super(VigenereDecrypt, self).__init__(application, "Decrypt")
+
+    def run_cipher(self, text, key):
+        shifts = string_to_shifts(key)
+        return reverse_vigenere(text, shifts)
