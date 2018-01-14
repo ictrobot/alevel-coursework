@@ -2,6 +2,10 @@ import tkinter as tk
 from cipher_window import CipherWindow
 from string import ascii_uppercase
 from utilities import SUBTITLE_LABEL_OPTIONS
+from widgets.tooltip import Tooltip
+
+NEEDED_MAPPING_COLOR = "yellow"
+DUPLICATE_MAPPING_COLOR = "red"
 
 
 def substitution(text, mapping):
@@ -31,18 +35,52 @@ class SubstitutionCipher(CipherWindow):
     def __init__(self, application):
         self.stringvars = {}
         self.entries = {}
+        self.tooltips = []
 
         super(SubstitutionCipher, self).__init__(application, "Substitution Cipher")
 
     def get_key(self):
-        """Returns the mapping"""
+        """Returns the mapping and shows which entries need to be filled in,
+        or have the identical mappings"""
+
+        # destroy any previous tooltips
+        for tooltip in self.tooltips:
+            tooltip.remove()
+        self.tooltips.clear()
+        # set all the entries back to default foreground and background colours
+        for letter in ascii_uppercase:
+            self.entries[letter].configure(background="SystemWindow", foreground="SystemWindowText")
+
         # iterate over every letter and store mappings
         mapping = {}
+        reverse_mapping_lists = {letter:[] for letter in ascii_uppercase}
+        input_text = self.get_input_text().upper()
         for letter in ascii_uppercase:
             string = self.stringvars[letter].get().upper()
             if string:
                 # if a letter mapping has been entered, store it in the map
                 mapping[letter] = string
+                # used to detect duplicates
+                reverse_mapping_lists[string].append(self.entries[letter])
+            elif letter in input_text:
+                # mapping is needed, but is not present
+                entry = self.entries[letter]
+                entry.configure(background=NEEDED_MAPPING_COLOR)
+                tooltip = Tooltip(entry, text="Mapping needed as letter present in input")
+                # store tooltip so it can be removed later
+                self.tooltips.append(tooltip)
+
+        # mark duplicates
+        for letter in ascii_uppercase:
+            reverse_mappings = reverse_mapping_lists[letter]
+            if len(reverse_mappings) > 1:
+                # more than one reverse mapping, mark the duplicate mappings
+                for entry in reverse_mappings:
+                    entry.configure(background=DUPLICATE_MAPPING_COLOR, foreground="white")
+                    tooltip = Tooltip(entry, text="Mapping is not unique!")
+                    # store tooltip so it can be removed later
+                    self.tooltips.append(tooltip)
+
         return mapping
 
     def run_cipher(self, text, key):
