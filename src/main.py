@@ -4,6 +4,7 @@ from ciphers.affine import AffineDecrypt, AffineEncrypt
 from ciphers.caesar import CaesarDecrypt, CaesarEncrypt
 from ciphers.scytale import ScytaleDecrypt, ScytaleEncrypt
 from ciphers.vigenere import VigenereEncrypt, VigenereDecrypt
+from ciphers.substitution import SubstitutionCipher
 from utilities import SUBTITLE_LABEL_OPTIONS, TITLE_LABEL_OPTIONS
 
 
@@ -48,21 +49,33 @@ class MainMenu(tk.Frame):
         self.next_row += 1
 
     def create_cipher_entry(self, cipher_name, cipher_encrypt, cipher_decrypt):
-        """Helper function to simplify the creation of cipher entries"""
+        """Helper function to simplify the creation of cipher entries. If there is one shared encrypt and decrypt window, pass None to cipher_decrypt"""
         # add label with the cipher's name
         tk.Label(self, text=cipher_name).grid(row=self.next_row, column=0, sticky="NW")
 
-        # setup the encrypt button
-        def encrypt_command():
-            self.application.show(cipher_encrypt)
-        encrypt_button = tk.Button(self, text="Encrypt", command=encrypt_command)
-        encrypt_button.grid(row=self.next_row, column=1, sticky="NESW")
+        if cipher_decrypt is not None:
+            # different encrypt and decrypt buttons
 
-        # setup the decrypt button
-        def decrypt_command():
-            self.application.show(cipher_decrypt)
-        decrypt_button = tk.Button(self, text="Decrypt", command=decrypt_command)
-        decrypt_button.grid(row=self.next_row, column=2, sticky="NESW")
+            # setup the encrypt button
+            def encrypt_command():
+                self.application.show(cipher_encrypt)
+            encrypt_button = tk.Button(self, text="Encrypt", command=encrypt_command)
+            encrypt_button.grid(row=self.next_row, column=1, sticky="NESW")
+
+            # setup the decrypt button
+            def decrypt_command():
+                self.application.show(cipher_decrypt)
+            decrypt_button = tk.Button(self, text="Decrypt", command=decrypt_command)
+            decrypt_button.grid(row=self.next_row, column=2, sticky="NESW")
+        else:
+            # one shared encrypt and decrypt button
+
+            # setup the encrypt/decrypt button
+            def shared_command():
+                self.application.show(cipher_encrypt)
+            encrypt_button = tk.Button(self, text="Encrypt/Decrypt", command=shared_command)
+            encrypt_button.grid(row=self.next_row, column=1, columnspan=2, sticky="NESW")
+
         # increment the next_row variable so the next item goes on the next row
         self.next_row += 1
 
@@ -74,6 +87,7 @@ class MainMenu(tk.Frame):
         self.create_subtitle("Simple Substitution Ciphers")
         self.create_cipher_entry("Caesar Cipher", CaesarEncrypt, CaesarDecrypt)
         self.create_cipher_entry("Affine Cipher", AffineEncrypt, AffineDecrypt)
+        self.create_cipher_entry("Substitution Cipher", SubstitutionCipher, None)
 
         self.create_subtitle("Polyalphabetic Substitution Ciphers")
         self.create_cipher_entry("Vigenère Cipher", VigenereEncrypt, VigenereDecrypt)
