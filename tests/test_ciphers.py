@@ -3,6 +3,7 @@ import unittest
 from ciphers.affine import affine, reverse_affine
 from ciphers.caesar import caesar
 from ciphers.scytale import reverse_scytale, scytale
+from ciphers.substitution import substitution
 from ciphers.vigenere import vigenere, string_to_shifts, reverse_vigenere
 
 
@@ -46,3 +47,7 @@ class TestCiphers(unittest.TestCase):
     def test_string_to_shifts(self):
         self.assertEqual(string_to_shifts("Lemon"), [11, 4, 12, 14, 13])
         self.assertEqual(string_to_shifts("Vigenere"), [21, 8, 6, 4, 13, 4, 17, 4])
+
+    def test_substitution(self):
+        self.assertEqual(substitution("Hello", {"H": "A", "E": "B", "L": "C", "O": "D"}), "abccd")
+        self.assertEqual(substitution("Substitution", {"S": "Q", "U": "E", "B": "T", "T": "U", "I": "A", "O": "D", "N": "G"}), "qetquaueuadg")
