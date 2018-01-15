@@ -1,11 +1,12 @@
+import random
 import tkinter as tk
+from string import ascii_uppercase
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from matplotlib.ticker import LinearLocator, PercentFormatter
 
 from cipher_window import CipherWindow
-from string import ascii_uppercase
 from utilities import SUBTITLE_LABEL_OPTIONS
 from widgets.tooltip import Tooltip
 
@@ -126,6 +127,15 @@ class SubstitutionCipher(CipherWindow):
         """Override CipherWindow to add letter frequency bar chart"""
         super(SubstitutionCipher, self).create_widgets()
         self.setup_bar_chart()
+        self.setup_option_buttons()
+
+    def setup_option_buttons(self):
+        """Additional useful buttons under the Cipher Window back button"""
+        frame = tk.Frame(self)
+        tk.Button(frame, text="Random Key", command=self.random_key).grid(row=0, column=0)
+        tk.Button(frame, text="Swap In/Out", command=self.swap).grid(row=0, column=1)
+        # under back button
+        frame.grid(row=1, column=1)
 
     def setup_bar_chart(self):
         """Setup the letter frequency bar chart"""
@@ -198,3 +208,27 @@ class SubstitutionCipher(CipherWindow):
                 bar.set_color("blue")
         # redraw the graph
         self.freq_canvas.show()
+
+    def random_key(self):
+        """Creates a random key"""
+        letters = list(ascii_uppercase)
+        random.shuffle(letters)
+        input_text = self.get_input_text().upper()
+        for letter in ascii_uppercase:
+            if letter in input_text:
+                self.stringvars[letter].set(letters.pop())
+            else:
+                self.stringvars[letter].set("")
+
+    def swap(self):
+        """Swaps the input text with the output text and reverses the mapping"""
+        # store the old output text
+        text_out = self.output_text.get(1.0, tk.END)
+        self.text_input.delete(1.0, tk.END)
+        # reverse the mapping
+        mapping = self.get_key()
+        reverse_mapping = {b: a for a, b in mapping.items()}
+        for letter in ascii_uppercase:
+            self.stringvars[letter].set(reverse_mapping.get(letter, ""))
+        # set the input text to be the old mapping text
+        self.text_input.insert(1.0, text_out)
