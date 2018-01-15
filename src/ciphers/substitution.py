@@ -36,6 +36,7 @@ class SubstitutionCipher(CipherWindow):
         self.stringvars = {}
         self.entries = {}
         self.tooltips = []
+        self.default_colours = {}
 
         super(SubstitutionCipher, self).__init__(application, "Substitution Cipher")
 
@@ -49,7 +50,7 @@ class SubstitutionCipher(CipherWindow):
         self.tooltips.clear()
         # set all the entries back to default foreground and background colours
         for letter in ascii_uppercase:
-            self.entries[letter].configure(background="SystemWindow", foreground="SystemWindowText")
+            self.entries[letter].configure(**self.default_colours)
 
         # iterate over every letter and store mappings
         mapping = {}
@@ -102,5 +103,9 @@ class SubstitutionCipher(CipherWindow):
             # setup entry for letter mapping
             self.entries[letter] = tk.Entry(frame, validate="key", validatecommand=(frame.register(valid_mapping_entry), "%P"), textvariable=self.stringvars[letter], width=2)
             self.entries[letter].grid(row=2, column=i)
+
+        # store the default colour options
+        self.default_colours["foreground"] = self.entries["A"].cget("foreground")
+        self.default_colours["background"] = self.entries["A"].cget("background")
 
         return frame
