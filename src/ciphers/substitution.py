@@ -1,4 +1,9 @@
 import tkinter as tk
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+from matplotlib.ticker import LinearLocator, PercentFormatter
+
 from cipher_window import CipherWindow
 from string import ascii_uppercase
 from utilities import SUBTITLE_LABEL_OPTIONS
@@ -37,6 +42,10 @@ class SubstitutionCipher(CipherWindow):
         self.entries = {}
         self.tooltips = []
         self.default_colours = {}
+
+        self.freq_subplot = None
+        self.freq_bars = None
+        self.freq_canvas = None
 
         super(SubstitutionCipher, self).__init__(application, "Substitution Cipher")
 
@@ -82,6 +91,9 @@ class SubstitutionCipher(CipherWindow):
                     # store tooltip so it can be removed later
                     self.tooltips.append(tooltip)
 
+        # update the bar chart
+        self.update_bar_chart(input_text, mapping)
+
         return mapping
 
     def run_cipher(self, text, key):
@@ -109,3 +121,67 @@ class SubstitutionCipher(CipherWindow):
         self.default_colours["background"] = self.entries["A"].cget("background")
 
         return frame
+
+    def create_widgets(self):
+        """Override CipherWindow to add letter frequency bar chart"""
+        super(SubstitutionCipher, self).create_widgets()
+        self.setup_bar_chart()
+
+    def setup_bar_chart(self):
+        """Setup the letter frequency bar chart"""
+        # make a new matplotlib figure
+        figure = Figure(figsize=(2, 4))
+        self.freq_subplot = figure.add_subplot(1, 1, 1)
+        # graph title
+        self.freq_subplot.set_title("Frequency Analysis")
+        # setup bar chart with all zero frequencies for all 26 letters
+        y_pos = list(range(26))
+        frequencies = [0] * len(ascii_uppercase)
+        self.freq_bars = self.freq_subplot.barh(y_pos, frequencies, height=0.8)
+        # set axis limits
+        self.freq_subplot.set_autoscale_on(False)
+        self.freq_subplot.set_xlim(0, 100)
+        self.freq_subplot.set_ylim(-0.5, 25.5)
+        # set positions, contents of labels and y limits
+        self.freq_subplot.set_yticks(y_pos)
+        self.freq_subplot.set_yticklabels(ascii_uppercase)
+        self.freq_subplot.invert_yaxis()
+        # set x axis to show % and to show 3 values
+        self.freq_subplot.xaxis.set_major_formatter(PercentFormatter())
+        self.freq_subplot.xaxis.set_major_locator(LinearLocator(numticks=3))
+        # setup canvas to embed inside tkinter window
+        self.freq_canvas = FigureCanvasTkAgg(figure, master=self)
+        self.freq_canvas.show()
+        self.freq_canvas.get_tk_widget().grid(column=1, row=2, rowspan=5, sticky="NSEW")
+        # remove some of the extra padding around the graph
+        figure.tight_layout(pad=0.2)
+
+    def update_bar_chart(self, text, mapping):
+        """Update the letter frequencies bar chart. text must be uppercase"""
+        # find letter frequencies
+        frequencies = {letter: 0 for letter in ascii_uppercase}
+        total_frequency = 0
+        for letter in text:
+            if 65 <= ord(letter) <= 90:
+                frequencies[letter] += 1
+                total_frequency += 1
+        # calculate percentages and set max x on graph
+        if total_frequency > 0:
+            for letter in frequencies:
+                frequencies[letter] /= total_frequency
+                frequencies[letter] *= 100
+            self.freq_subplot.set_xlim(0, max(frequencies.values()))
+        else:
+            # no data, just set axis limit to 100%
+            self.freq_subplot.set_xlim(0, 100)
+        # iterate over bars, updating size & colour
+        for letter, bar in zip(ascii_uppercase, self.freq_bars):
+            bar.set_width(frequencies[letter])
+
+            if letter in mapping:
+                # make the bar green if a mapping exists
+                bar.set_color("green")
+            else:
+                bar.set_color("blue")
+        # redraw the graph
+        self.freq_canvas.show()
