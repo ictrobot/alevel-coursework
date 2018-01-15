@@ -2,6 +2,7 @@ import unittest
 
 from ciphers.affine import affine, reverse_affine
 from ciphers.caesar import caesar
+from ciphers.keyword import keyword_mapping
 from ciphers.scytale import reverse_scytale, scytale
 from ciphers.substitution import substitution
 from ciphers.vigenere import vigenere, string_to_shifts, reverse_vigenere
@@ -51,3 +52,10 @@ class TestCiphers(unittest.TestCase):
     def test_substitution(self):
         self.assertEqual(substitution("Hello", {"H": "A", "E": "B", "L": "C", "O": "D"}), "abccd")
         self.assertEqual(substitution("Substitution", {"S": "Q", "U": "E", "B": "T", "T": "U", "I": "A", "O": "D", "N": "G"}), "qetquaueuadg")
+
+    def test_generate_keyword_mapping(self):
+        mapping_a = {'A': 'K', 'B': 'E', 'C': 'Y', 'D': 'W', 'E': 'O', 'F': 'R', 'G': 'D', 'H': 'A', 'I': 'B', 'J': 'C', 'K': 'F', 'L': 'G', 'M': 'H', 'N': 'I', 'O': 'J', 'P': 'L', 'Q': 'M', 'R': 'N', 'S': 'P', 'T': 'Q', 'U': 'S', 'V': 'T', 'W': 'U', 'X': 'V', 'Y': 'X', 'Z': 'Z'}
+        self.assertEqual(keyword_mapping("keyword"), mapping_a)
+
+        mapping_b = {'A': 'C', 'B': 'R', 'C': 'Y', 'D': 'P', 'E': 'T', 'F': 'O', 'G': 'G', 'H': 'A', 'I': 'H', 'J': 'B', 'K': 'D', 'L': 'E', 'M': 'F', 'N': 'I', 'O': 'J', 'P': 'K', 'Q': 'L', 'R': 'M', 'S': 'N', 'T': 'Q', 'U': 'S', 'V': 'U', 'W': 'V', 'X': 'W', 'Y': 'X', 'Z': 'Z'}
+        self.assertEqual(keyword_mapping("CRYPTOGRAPHY"), mapping_b)
