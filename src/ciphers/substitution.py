@@ -149,12 +149,25 @@ class SubstitutionCipher(CipherWindow):
         # set x axis to show % and to show 3 values
         self.freq_subplot.xaxis.set_major_formatter(PercentFormatter())
         self.freq_subplot.xaxis.set_major_locator(LinearLocator(numticks=3))
-        # setup canvas to embed inside tkinter window
-        self.freq_canvas = FigureCanvasTkAgg(figure, master=self)
-        self.freq_canvas.show()
-        self.freq_canvas.get_tk_widget().grid(column=1, row=2, rowspan=5, sticky="NSEW")
-        # remove some of the extra padding around the graph
-        figure.tight_layout(pad=0.2)
+
+        def size_callback(event):
+            # remove the callback
+            self.text_input.unbind("<Configure>", bind_id)
+            # on my normal resolution monitor, the text input is 5.5 inches wide.
+            # native tkinter widgets scale correctly on high resolution screens.
+            # therefore the size of the text_input can be used to calculate
+            # an approximation of the screen dpi.
+            dpi = self.text_input.winfo_width() / 5.5
+            figure.set_dpi(dpi)
+            # now that dpi is set, setup canvas to embed inside tkinter window
+            self.freq_canvas = FigureCanvasTkAgg(figure, master=self)
+            self.freq_canvas.show()
+            self.freq_canvas.get_tk_widget().grid(column=1, row=2, rowspan=5, sticky="NSEW")
+            # remove some of the extra padding around the graph
+            figure.tight_layout(pad=0.2)
+        # wait for text_input size to be set, as it's size is used for
+        # the dpi calculation
+        bind_id = self.text_input.bind("<Configure>", size_callback)
 
     def update_bar_chart(self, text, mapping):
         """Update the letter frequencies bar chart. text must be uppercase"""
