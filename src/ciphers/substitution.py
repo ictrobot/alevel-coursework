@@ -112,16 +112,28 @@ class SubstitutionCipher(CipherWindow):
             tk.Label(frame, text=letter).grid(row=1, column=i)
             # setup stringvar for storing mapping
             self.stringvars[letter] = tk.StringVar(self)
-            self.stringvars[letter].trace("w", lambda *args: self.update_output())
             # setup entry for letter mapping
             self.entries[letter] = tk.Entry(frame, validate="key", validatecommand=(frame.register(valid_mapping_entry), "%P"), textvariable=self.stringvars[letter], width=2)
             self.entries[letter].grid(row=2, column=i)
+        # setup stringvar callbacks
+        self.setup_stringvar_callbacks()
 
         # store the default colour options
         self.default_colours["foreground"] = self.entries["A"].cget("foreground")
         self.default_colours["background"] = self.entries["A"].cget("background")
 
         return frame
+
+    def setup_stringvar_callbacks(self):
+        """Setup the callbacks so when the mapping is changed the output updates"""
+        for stringvar in self.stringvars.values():
+            trace_id = stringvar.trace("w", lambda *args: self.update_output())
+            stringvar.trace_id = trace_id
+
+    def remove_stringvar_callbacks(self):
+        """Remove the callbacks for faster processing of mapping changes"""
+        for stringvar in self.stringvars.values():
+            stringvar.trace_vdelete("w", stringvar.trace_id)
 
     def create_widgets(self):
         """Override CipherWindow to add letter frequency bar chart"""
@@ -211,6 +223,10 @@ class SubstitutionCipher(CipherWindow):
 
     def random_key(self):
         """Creates a random key"""
+        # remove the mapping entry widgets callbacks so the output does
+        # not get updated every time one of the entries is changed
+        self.remove_stringvar_callbacks()
+
         letters = list(ascii_uppercase)
         random.shuffle(letters)
         input_text = self.get_input_text().upper()
@@ -220,8 +236,17 @@ class SubstitutionCipher(CipherWindow):
             else:
                 self.stringvars[letter].set("")
 
+        # setup the mapping entry widgets callbacks again so the output
+        # updates if the mapping is changed
+        self.setup_stringvar_callbacks()
+        self.update_output()
+
     def swap(self):
         """Swaps the input text with the output text and reverses the mapping"""
+        # remove the mapping entry widgets callbacks so the output does
+        # not get updated every time one of the entries is changed
+        self.remove_stringvar_callbacks()
+
         # store the old output text
         text_out = self.output_text.get(1.0, tk.END)
         self.text_input.delete(1.0, tk.END)
@@ -232,3 +257,8 @@ class SubstitutionCipher(CipherWindow):
             self.stringvars[letter].set(reverse_mapping.get(letter, ""))
         # set the input text to be the old mapping text
         self.text_input.insert(1.0, text_out)
+
+        # setup the mapping entry widgets callbacks again so the output
+        # updates if the mapping is changed
+        self.setup_stringvar_callbacks()
+        self.update_output()
