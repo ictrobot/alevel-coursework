@@ -2,6 +2,7 @@ import tkinter as tk
 
 from ciphers.affine import AffineDecrypt, AffineEncrypt
 from ciphers.caesar import CaesarDecrypt, CaesarEncrypt
+from ciphers.keyword import KeywordDecrypt, KeywordEncrypt
 from ciphers.scytale import ScytaleDecrypt, ScytaleEncrypt
 from ciphers.vigenere import VigenereEncrypt, VigenereDecrypt
 from ciphers.substitution import SubstitutionCipher
@@ -87,6 +88,7 @@ class MainMenu(tk.Frame):
         self.create_subtitle("Simple Substitution Ciphers")
         self.create_cipher_entry("Caesar Cipher", CaesarEncrypt, CaesarDecrypt)
         self.create_cipher_entry("Affine Cipher", AffineEncrypt, AffineDecrypt)
+        self.create_cipher_entry("Keyword Cipher", KeywordEncrypt, KeywordDecrypt)
         self.create_cipher_entry("Substitution Cipher", SubstitutionCipher, None)
 
         self.create_subtitle("Polyalphabetic Substitution Ciphers")
