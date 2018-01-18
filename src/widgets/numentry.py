@@ -1,5 +1,7 @@
 import tkinter as tk
 
+from widgets.tooltip import Tooltip
+
 
 class NumEntry(tk.Frame):
     def __init__(self, master, min=None, max=None, default=None, callback=None, label=None):
@@ -24,6 +26,10 @@ class NumEntry(tk.Frame):
         tk.Entry(self, width=5, textvariable=self.stringvar, validate="key", validatecommand=(master.register(self.valid_input), "%P")).grid(row=0, column=1)
         tk.Button(self, text="▲", command=self.increment).grid(row=0, column=2)
         tk.Button(self, text="▼", command=self.decrement).grid(row=0, column=3)
+
+        # setup the tooltip
+        self.tooltip = None
+        self.setup_tooltip()
 
     def valid_input(self, text):
         """Callback from tkinter to validate if the new text is valid"""
@@ -96,3 +102,19 @@ class NumEntry(tk.Frame):
         if self.callback:
             self.callback()
         return i
+
+    def setup_tooltip(self):
+        """Setup the tooltip displaying the minimum and maximum"""
+        # remove the old tooltip if it exists
+        if self.tooltip:
+            self.tooltip.remove()
+            self.tooltip = None
+        # setup the new tooltip depending on which range checks are in place.
+        if self.min is not None and self.max is not None:
+            self.tooltip = Tooltip(self, "Range: {}-{} inclusive".format(self.min, self.max))
+        elif self.min is not None:
+            self.tooltip = Tooltip(self, "Minimum: {}".format(self.min))
+        elif self.max is not None:
+            self.tooltip = Tooltip(self, "Maximum: {}".format(self.max))
+        else:
+            self.tooltip = Tooltip(self, "Any integer")
