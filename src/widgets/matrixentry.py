@@ -84,6 +84,9 @@ class MatrixEntry(tk.Frame):
             # setup the entry widget
             self.entries[r, c] = tk.Entry(self, width=3, textvariable=stringvar, validate="key", validatecommand=self.validate_command)
             self.entries[r, c].grid(row=r, column=c)
+        # fix tab order
+        for r, c in sorted(new):
+            self.entries[r, c].lift()
         # store the new size
         self.rows = new_rows
         self.columns = new_columns
