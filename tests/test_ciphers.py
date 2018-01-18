@@ -1,4 +1,5 @@
 import unittest
+import numpy
 
 from ciphers.affine import affine, reverse_affine
 from ciphers.caesar import caesar
@@ -6,6 +7,7 @@ from ciphers.keyword import keyword_mapping
 from ciphers.scytale import reverse_scytale, scytale
 from ciphers.substitution import substitution
 from ciphers.vigenere import vigenere, string_to_shifts, reverse_vigenere
+from ciphers.hill import hill, reverse_hill
 
 
 class TestCiphers(unittest.TestCase):
@@ -59,3 +61,11 @@ class TestCiphers(unittest.TestCase):
 
         mapping_b = {'A': 'C', 'B': 'R', 'C': 'Y', 'D': 'P', 'E': 'T', 'F': 'O', 'G': 'G', 'H': 'A', 'I': 'H', 'J': 'B', 'K': 'D', 'L': 'E', 'M': 'F', 'N': 'I', 'O': 'J', 'P': 'K', 'Q': 'L', 'R': 'M', 'S': 'N', 'T': 'Q', 'U': 'S', 'V': 'U', 'W': 'V', 'X': 'W', 'Y': 'X', 'Z': 'Z'}
         self.assertEqual(keyword_mapping("CRYPTOGRAPHY"), mapping_b)
+
+    def test_hill(self):
+        self.assertEqual(hill("Hello World", numpy.matrix("19 2 8; 17 7 11; 19 15 18"), pad="Z"), "VIBXHJYKRVHY")
+        self.assertEqual(hill("Polygraphic substitution cipher", numpy.matrix("10 7 17; 7 9 15; 1 11 18"), pad="Z"), "TGDZJGQGFKGQTDRXWHBPJFLLSKNMKR")
+
+    def test_reverse_hill(self):
+        self.assertEqual(reverse_hill("VIBXHJYKRVHY", numpy.matrix("19 2 8; 17 7 11; 19 15 18")), "HELLOWORLDZZ")
+        self.assertEqual(reverse_hill("TGDZJGQGFKGQTDRXWHBPJFLLSKNMKR", numpy.matrix("10 7 17; 7 9 15; 1 11 18")), "POLYGRAPHICSUBSTITUTIONCIPHERZ")
