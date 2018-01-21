@@ -4,7 +4,7 @@ from string import ascii_uppercase
 import numpy
 
 from cipher_window import CipherWindow
-from utilities import mod_inverse
+from utilities import mod_inverse, greatest_common_divisor
 from widgets.numentry import NumEntry
 from widgets.matrixentry import MatrixEntry
 
@@ -94,6 +94,16 @@ def reverse_hill(ciphertext, key):
     return output
 
 
+def check_key_reversible(key):
+    """Convenience method to quickly check if the key is reversible without actually doing the full decryption process"""
+    det = int(round(numpy.linalg.det(key)))
+    if det == 0:
+        return False, "Impossible to decrypt as det(key) == 0"
+    if greatest_common_divisor(det, 26) != 1:
+        return False, "Impossible to decrypt as 26 and det(key) need to be co-prime"
+    return True, ""
+
+
 class HillCipher(CipherWindow):
     """Base Cipher Window for the Hill Cipher"""
 
@@ -149,6 +159,10 @@ class HillEncrypt(HillCipher):
         super(HillEncrypt, self).__init__(application, "Encrypt")
 
     def run_cipher(self, text, matrix):
+        # check if the matrix is reversible, if it not display a warning
+        reversible, reason = check_key_reversible(matrix)
+        if not reversible:
+            self.set_error(reason)
         return hill(text, matrix)
 
 
