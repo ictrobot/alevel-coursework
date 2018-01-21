@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from string import ascii_uppercase
 
 import numpy
@@ -135,14 +136,89 @@ class HillCipher(CipherWindow):
         self.order_input = NumEntry(frame, label="Order: ", min=2, default=self.current_order, callback=self.update_output)
         self.order_input.grid(row=0, column=0, sticky="NW")
 
+        # add option buttons
+        self.option_buttons_frame(frame).grid(row=1, column=0, sticky="NW")
+        # set the bottom empty row to expand so the option buttons don't move
+        frame.grid_rowconfigure(2, weight=1)
+
         # set the middle empty column to expand to fill the free space
         frame.grid_columnconfigure(1, weight=1)
 
         # setup matrixentry for the actual matrix
         self.matrix_input = MatrixEntry(frame, self.current_order, self.current_order, callback=self.update_output)
-        self.matrix_input.grid(row=0, column=2, sticky="NE")
+        self.matrix_input.grid(row=0, column=2, rowspan=3, sticky="NE")
 
         return frame
+
+    def option_buttons_frame(self, key_frame):
+        """Additional useful buttons"""
+        frame = tk.Frame(key_frame)
+        tk.Button(frame, text="Copy Matrix", command=self.copy_matrix).grid(sticky="EW")
+        tk.Button(frame, text="Paste Matrix", command=self.paste_matrix).grid(sticky="EW")
+        tk.Button(frame, text="Random Matrix", command=self.random_matrix).grid(sticky="EW")
+        return frame
+
+    def copy_matrix(self):
+        """Copy the key matrix to the clipboard"""
+        matrix = self.matrix_input.get_numpy_matrix()
+        # convert the matrix to text
+        rows = []
+        for i in range(self.current_order):
+            row = []
+            for j in range(self.current_order):
+                row.append(str(matrix.item(i, j)))
+            rows.append("\t".join(row))
+        text = "\n".join(rows)
+        # tries to set the clipboard to the text
+        try:
+            self.clipboard_clear()
+            self.clipboard_append(text)
+        except tk.TclError:
+            messagebox.showerror("Error", "Failed to write to clipboard")
+
+    def paste_matrix(self):
+        """Paste the key matrix from the clipboard"""
+        # tries to read the contents of the clipboard
+        try:
+            contents = self.clipboard_get()
+        except tk.TclError:
+            messagebox.showerror("Error", "Failed to read from clipboard")
+            return
+        try:
+            # try to parse the contents
+            rows = contents.split("\n")
+            matrix_data = [[0 for j in range(len(rows))] for i in range(len(rows))]
+            for i in range(len(rows)):
+                row = rows[i].split("\t")
+                if len(row) != len(rows):
+                    raise ValueError
+                for j in range(len(rows)):
+                    matrix_data[i][j] = int(row[j])
+            matrix = numpy.matrix(matrix_data)
+            # set the matrix
+            self.matrix_input.set_matrix(matrix)
+            self.order_input.set_num(len(rows))
+            self.current_order = len(rows)
+        except ValueError:
+            messagebox.showerror("Error", "Failed to parse key from clipboard")
+
+    def random_matrix(self):
+        """Generate a random key matrix"""
+        # finding a large matrix which is reversible for the hill cipher can take a long time
+        # therefore I decided to limit it to matrices less than 15x15.
+        if self.current_order > 15:
+            messagebox.showerror("Error", "Random matrix generation is only supported with order 15 or less")
+            return
+        # generate random matrices
+        matrix_size = (self.current_order, self.current_order)
+        while True:
+            random_array = numpy.random.randint(0, 25, size=matrix_size)
+            reversible, reason = check_key_reversible(random_array)
+            if reversible:
+                # if it is reversible set it as the key matrix & return
+                matrix = numpy.asmatrix(random_array)
+                self.matrix_input.set_matrix(matrix)
+                return
 
     def create_widgets(self):
         super(HillCipher, self).create_widgets()

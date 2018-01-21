@@ -77,6 +77,14 @@ class NumEntry(tk.Frame):
         # otherwise the text must be a valid int as it is validated each time it is modified.
         return int(text)
 
+    def set_num(self, n):
+        """Set the number"""
+        if self.valid_input(str(n)):
+            self.stringvar.set(str(n))
+        else:
+            # number does not match range
+            raise ValueError("set_num n is not in range")
+
     def increment(self):
         """Increments the stored number"""
         # get the number, use 0 if the box is empty, and add one
