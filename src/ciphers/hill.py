@@ -124,11 +124,22 @@ class HillCipher(CipherWindow):
         # setup numentry for matrix order
         self.order_input = NumEntry(frame, label="Order: ", min=2, default=self.current_order, callback=self.update_output)
         self.order_input.grid(row=0, column=0, sticky="NW")
+
+        # set the middle empty column to expand to fill the free space
+        frame.grid_columnconfigure(1, weight=1)
+
         # setup matrixentry for the actual matrix
         self.matrix_input = MatrixEntry(frame, self.current_order, self.current_order, callback=self.update_output)
-        self.matrix_input.grid(row=0, column=1, sticky="NE")
+        self.matrix_input.grid(row=0, column=2, sticky="NE")
 
         return frame
+
+    def create_widgets(self):
+        super(HillCipher, self).create_widgets()
+        # get the key frame and set it to fill available space
+        for widget in self.grid_slaves(3, 0): # row and column of grid frame
+            widget.grid_forget()
+            widget.grid(row=3, column=0, sticky="NESW")
 
 
 class HillEncrypt(HillCipher):
