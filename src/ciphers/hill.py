@@ -1,7 +1,12 @@
+import tkinter as tk
 from string import ascii_uppercase
+
 import numpy
 
+from cipher_window import CipherWindow
 from utilities import mod_inverse
+from widgets.numentry import NumEntry
+from widgets.matrixentry import MatrixEntry
 
 
 def hill(text, key, pad="Z"):
@@ -87,3 +92,60 @@ def reverse_hill(ciphertext, key):
             letter_num = int(transformed_matrix.item(j))
             output += ascii_uppercase[letter_num]
     return output
+
+
+class HillCipher(CipherWindow):
+    """Base Cipher Window for the Hill Cipher"""
+
+    def __init__(self, application, mode):
+        self.matrix_input = None
+        self.order_input = None
+        self.current_order = 2
+
+        super(HillCipher, self).__init__(application, "Hill Cipher - " + mode)
+
+    def get_key(self):
+        """Returns the key or None if it is invalid"""
+        # resize the matrix first if needed
+        order = self.order_input.get_num()
+        if order is not None and order != self.current_order:
+            self.current_order = order
+            self.matrix_input.resize(order, order)
+        # get numpy matrix representing the matrix input
+        return self.matrix_input.get_numpy_matrix()
+
+    def run_cipher(self, text, key):
+        """Subclasses actually run the hill cipher"""
+        raise NotImplementedError()
+
+    def tk_key_frame(self):
+        """Get the key input"""
+        frame = tk.Frame(self)
+        # setup numentry for matrix order
+        self.order_input = NumEntry(frame, label="Order: ", min=2, default=self.current_order, callback=self.update_output)
+        self.order_input.grid(row=0, column=0, sticky="NW")
+        # setup matrixentry for the actual matrix
+        self.matrix_input = MatrixEntry(frame, self.current_order, self.current_order, callback=self.update_output)
+        self.matrix_input.grid(row=0, column=1, sticky="NE")
+
+        return frame
+
+
+class HillEncrypt(HillCipher):
+    """Hill Encryption Cipher Window"""
+
+    def __init__(self, application):
+        super(HillEncrypt, self).__init__(application, "Encrypt")
+
+    def run_cipher(self, text, matrix):
+        return hill(text, matrix)
+
+
+class HillDecrypt(HillCipher):
+    """Hill Decryption Cipher Window"""
+
+    def __init__(self, application):
+        super(HillDecrypt, self).__init__(application, "Decrypt")
+
+    def run_cipher(self, text, matrix):
+        return reverse_hill(text, matrix)
