@@ -1,5 +1,6 @@
 import tkinter as tk
 
+from solver_window import SolverWindow
 from utilities import SUBTITLE_LABEL_OPTIONS, TITLE_LABEL_OPTIONS
 from widgets.outputtext import OutputText
 
@@ -38,6 +39,13 @@ class CipherWindow(tk.Frame):
         # back button
         tk.Button(self, text="Back", command=lambda: self.application.show_main_menu()).grid(row=0, column=1, sticky="NE")
 
+        # solve button
+        if self.get_solver() is not None:
+            self.solve_button = tk.Button(self, text="Solve", command=self.show_solver, state="disabled")
+            self.solve_button.grid(row=3, column=1, sticky="NE")
+        else:
+            self.solve_button = None
+
         # when expanding the height of the window, expand the size of the text boxes.
         self.grid_rowconfigure(2, weight=1)
         self.grid_rowconfigure(6, weight=1)
@@ -56,6 +64,11 @@ class CipherWindow(tk.Frame):
         self.set_error("")
         # get the input text and key
         input_text = self.get_input_text()
+
+        if self.solve_button is not None:
+            # if the input is at least 4 long, enable the solve button
+            self.solve_button["state"] = "normal" if len(input_text) >= 4 else "disabled"
+
         key = self.get_key()
         if key is None:
             # if the key is invalid
@@ -79,6 +92,9 @@ class CipherWindow(tk.Frame):
         """Get the input text"""
         return self.text_input.get(1.0, tk.END).strip()
 
+    def show_solver(self):
+        self.application.show(SolverWindow, self.get_solver(), self.get_input_text(), self)
+
     # The below methods are designed to be overridden by cipher implementations
     def get_key(self):
         """Returns the key to be used for the cipher, or none if it is invalid"""
@@ -91,3 +107,7 @@ class CipherWindow(tk.Frame):
     def tk_key_frame(self):
         """Returns the tkinter frame with the key inputs for the cipher"""
         raise NotImplementedError()
+
+    def get_solver(self):
+        """Returns the solver if there is one"""
+        return None
