@@ -69,3 +69,8 @@ class CaesarDecrypt(CaesarCipher):
     def run_cipher(self, text, shift):
         # negative shift is the same as decryption
         return caesar(text, -shift)
+
+    def get_solver(self):
+        # Has to be imported here so the solver file can import the entire cipher file
+        from solvers.caesar import CaesarSolver
+        return CaesarSolver()
