@@ -35,6 +35,15 @@ class Application(tk.Tk):
         self.frame = frame_class(self, *args, **kwargs)
         self.frame.pack()
 
+    def show_existing(self, frame):
+        """ Shows a frame which was already created by the show() method"""
+        # remove the old frame if there was one
+        if self.frame is not None:
+            self.frame.forget()
+        # pack the new frame into the window
+        self.frame = frame
+        self.frame.pack()
+
 
 class MainMenu(tk.Frame):
     def __init__(self, application):
