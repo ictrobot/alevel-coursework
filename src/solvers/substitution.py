@@ -1,4 +1,4 @@
-from solvers.solver_thread import SolverThread
+from solvers.solver_process import SolverProcess
 from ciphers.substitution import *
 from ngrams import *
 
@@ -29,7 +29,7 @@ def get_starting_mapping(text):
     return mapping
 
 
-class SubstitutionSolver(SolverThread):
+class SubstitutionSolver(SolverProcess):
     """ Automatic key finder for the Substitution Cipher"""
 
     def __init__(self):

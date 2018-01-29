@@ -1,8 +1,8 @@
-from solvers.solver_thread import SolverThread
+from solvers.solver_process import SolverProcess
 from ciphers.caesar import *
 
 
-class CaesarSolver(SolverThread):
+class CaesarSolver(SolverProcess):
     """ Automatic key finder for the Caesar Cipher"""
 
     def __init__(self):

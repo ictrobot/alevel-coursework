@@ -5,14 +5,14 @@ import tkinter as tk
 
 
 def start_solver(solver, text):
-    """ Start the solver thread """
+    """ Start the solver process """
     process = multiprocessing.Process(target=run_solver, args=(solver, text), name="Solver", daemon=True)
     process.start()
     return process
 
 
 def run_solver(solver, text):
-    """ Entry point for solver thread """
+    """ Entry point for solver process """
     # store the start time
     start_time = time.time()
     # actually run the solver on the text
@@ -22,7 +22,7 @@ def run_solver(solver, text):
     print("Took {:.2f} seconds to solve".format(time_taken))
 
 
-class SolverThread:
+class SolverProcess:
 
     def __init__(self, cipher_name):
         self.cipher_name = cipher_name

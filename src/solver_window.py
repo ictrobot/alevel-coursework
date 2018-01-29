@@ -1,7 +1,7 @@
 import tkinter as tk
 import queue
 
-from solvers.solver_thread import start_solver
+from solvers.solver_process import start_solver
 from utilities import TITLE_LABEL_OPTIONS, SUBTITLE_LABEL_OPTIONS
 from widgets.outputtext import OutputText
 from widgets.scrollframe import ScrollFrame
@@ -18,7 +18,7 @@ class SolverWindow(tk.Frame):
         # setup widgets
         self.create_widgets()
         # start the solver
-        self.solver_thread = start_solver(self.solver, text)
+        self.solver_process = start_solver(self.solver, text)
         # schedule update
         self.after(1000 // 30, self.update_from_solver)
 
@@ -48,7 +48,7 @@ class SolverWindow(tk.Frame):
         tk.Label(self.outputs_inner_frame, text="Text").grid(row=0, column=2)
 
     def update_from_solver(self):
-        """ Called 30 times a second on the main thread to update progress from solver thread """
+        """ Called 30 times a second on the main process to update progress from solver process """
         # check if the solver has been stopped
         if self.solver.solver_queue is None:
             return
@@ -95,10 +95,10 @@ class SolverWindow(tk.Frame):
 
     def stop_solver(self):
         """ Stop / wait for the solver to stop """
-        if self.solver_thread is not None:
-            self.solver_thread.terminate()
-            self.solver_thread.join()
-            self.solver_thread = None
+        if self.solver_process is not None:
+            self.solver_process.terminate()
+            self.solver_process.join()
+            self.solver_process = None
             self.done()
 
     def done(self):

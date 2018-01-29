@@ -1,4 +1,4 @@
-from solvers.solver_thread import SolverThread
+from solvers.solver_process import SolverProcess
 from ciphers.scytale import *
 
 
@@ -13,7 +13,7 @@ def factors(integer):
     return list(results)
 
 
-class ScytaleSolver(SolverThread):
+class ScytaleSolver(SolverProcess):
     """ Automatic key finder for the Scytale Cipher"""
 
     def __init__(self):
