@@ -133,7 +133,7 @@ class SolverWindow(tk.Frame):
                 display_text = text
             # row to display output on
             row = i + 1
-            if i <= len(self.outputs):
+            if i == len(self.outputs):
                 # if this is a new row, create new blank placeholder widgets
                 tk.Label(frame, text="").grid(row=row, column=0)
                 self.solver.get_key_widget(frame).grid(row=row, column=1)
