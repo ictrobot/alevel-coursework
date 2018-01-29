@@ -66,3 +66,8 @@ class ScytaleDecrypt(ScytaleCipher):
 
     def run_cipher(self, text, columns):
         return reverse_scytale(text, columns)
+
+    def get_solver(self):
+        # Has to be imported here so the solver file can import the entire cipher file
+        from solvers.scytale import ScytaleSolver
+        return ScytaleSolver()
