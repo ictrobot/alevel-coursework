@@ -105,3 +105,8 @@ class AffineDecrypt(AffineCipher):
         a, b = key
         # negative shift is the same as decryption
         return reverse_affine(text, a, b)
+
+    def get_solver(self):
+        # Has to be imported here so the solver file can import the entire cipher file
+        from solvers.affine import AffineSolver
+        return AffineSolver()
