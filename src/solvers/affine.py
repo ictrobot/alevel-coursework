@@ -21,3 +21,8 @@ class AffineSolver(SolverThread):
                 plaintext = reverse_affine(text, a, b)
                 self.possibility(key, plaintext)
         self.done()
+
+    def update_key_widget(self, widget, key):
+        """ Called to update the key widget to display the provided key """
+        # Format the key display nicely
+        widget["text"] = "a={} b={}".format(*key)
