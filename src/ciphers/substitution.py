@@ -146,6 +146,10 @@ class SubstitutionCipher(CipherWindow):
         frame = tk.Frame(self)
         tk.Button(frame, text="Random Key", command=self.random_key).grid(row=0, column=0)
         tk.Button(frame, text="Swap In/Out", command=self.swap).grid(row=0, column=1)
+        # move solve button into option buttons as it is covered by the bar chart
+        self.solve_button.destroy()
+        self.solve_button = tk.Button(frame, text="Solve", command=self.show_solver, state="disabled")
+        self.solve_button.grid(row=0, column=2)
         # under back button
         frame.grid(row=1, column=1)
 
@@ -262,3 +266,8 @@ class SubstitutionCipher(CipherWindow):
         # updates if the mapping is changed
         self.setup_stringvar_callbacks()
         self.update_output()
+
+    def get_solver(self):
+        # Has to be imported here so the solver file can import the entire cipher file
+        from solvers.substitution import SubstitutionSolver
+        return SubstitutionSolver()
