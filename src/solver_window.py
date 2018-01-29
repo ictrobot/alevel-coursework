@@ -96,6 +96,7 @@ class SolverWindow(tk.Frame):
     def stop_solver(self):
         """ Stop / wait for the solver to stop """
         if self.solver_thread is not None:
+            self.solver_thread.terminate()
             self.solver_thread.join()
             self.solver_thread = None
             self.done()

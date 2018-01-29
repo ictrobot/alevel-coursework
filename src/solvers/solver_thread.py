@@ -1,15 +1,14 @@
 import ngrams
 import time
-import threading
-import queue
+import multiprocessing
 import tkinter as tk
 
 
 def start_solver(solver, text):
     """ Start the solver thread """
-    thread = threading.Thread(target=run_solver, args=(solver, text), name="Solver", daemon=True)
-    thread.start()
-    return thread
+    process = multiprocessing.Process(target=run_solver, args=(solver, text), name="Solver", daemon=True)
+    process.start()
+    return process
 
 
 def run_solver(solver, text):
@@ -35,7 +34,7 @@ class SolverThread:
         # indeterminate_possibilities   none
         # increment_progress            none
         # outputs                       [(text, key, score), (text, key, score)...]
-        self.solver_queue = queue.Queue()
+        self.solver_queue = multiprocessing.Queue()
 
     def set_total_possibilities(self, n):
         """ Set the total number of possibilities """
