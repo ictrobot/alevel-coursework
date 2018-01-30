@@ -29,16 +29,26 @@ def get_starting_mapping(text):
     return mapping
 
 
+def uppercase_starting_index(index):
+    """Returns the alphabet starting at index and then looping back around"""
+    # index 0:      A, B, ..., Y, Z
+    # index 5:      F, G, ..., Y, Z, A, B, ..., E
+    return ascii_uppercase[index:] + ascii_uppercase[:index]
+
+
 class SubstitutionSolver(SolverProcess):
     """ Automatic key finder for the Substitution Cipher"""
 
     def __init__(self):
         super(SubstitutionSolver, self).__init__("Substitution Cipher")
+        self.swap_index1 = 0
+        self.swap_index2 = 0
 
     def try_swapping(self, text, mapping, score):
         """ Tries to improve the mapping by swapping two letters"""
-        for letter1 in ascii_uppercase:
-            for letter2 in ascii_uppercase:
+        # carry on checking from the where the improvement was last time
+        for letter1 in uppercase_starting_index(self.swap_index1):
+            for letter2 in uppercase_starting_index(self.swap_index2):
                 # only try to swap with letters after letter1
                 if letter2 <= letter1:
                     continue
@@ -48,8 +58,15 @@ class SubstitutionSolver(SolverProcess):
                 # rate the output using the new mapping
                 new_score = rate(substitution(text, new_mapping))
                 if new_score < score:
+                    # store the current index where the improvement was to continue from later
+                    self.swap_index1 = ascii_uppercase.index(letter1)
+                    self.swap_index2 = ascii_uppercase.index(letter2)
                     # if the new mapping is better, return it
                     return new_mapping, new_score
+            # reset the swap index so the next inner loop starts at 0
+            self.swap_index2 = 0
+        # reset the swap index so the time the function is called it starts at 0
+        self.swap_index1 = 0
         # no better mapping found by swapping
         return None, None
 
