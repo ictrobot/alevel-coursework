@@ -39,8 +39,8 @@ class SubstitutionSolver(SolverProcess):
         """ Tries to improve the mapping by swapping two letters"""
         for letter1 in ascii_uppercase:
             for letter2 in ascii_uppercase:
-                # don't try to swap a letter with itself
-                if letter1 == letter2:
+                # only try to swap with letters after letter1
+                if letter2 <= letter1:
                     continue
                 # copy the mapping, swapping the values
                 new_mapping = mapping.copy()
