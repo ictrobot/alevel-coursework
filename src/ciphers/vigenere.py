@@ -110,3 +110,8 @@ class VigenereDecrypt(VigenereCipher):
     def run_cipher(self, text, key):
         shifts = string_to_shifts(key)
         return reverse_vigenere(text, shifts)
+
+    def get_solver(self):
+        # Has to be imported here so the solver file can import the entire cipher file
+        from solvers.vigenere import VigenereSolver
+        return VigenereSolver()
