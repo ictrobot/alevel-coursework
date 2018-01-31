@@ -74,14 +74,25 @@ class VigenereSolver(SolverProcess):
             if 65 <= ord(letter) <= 90:
                 letters_only += letter
         # all the possible lengths to test
-        lengths = list(range(2, min(30, len(letters_only))))
+        lengths = list(range(2, min(50, len(letters_only))))
         # set the number of possibilities
         self.set_total_possibilities(len(lengths))
+        # store the found keys
+        found_keys = set()
         # iterate over each length to check
         for length in lengths:
             # try and find the best key that is `length` long
             key = best_n_long_key(letters_only, length)
             shifts = string_to_shifts(key)
+            # check if key is double an existing key
+            if len(key) % 2 == 0:
+                first_half = key[:len(key) // 2]
+                second_half = key[len(key) // 2:]
+                if first_half == second_half and first_half in found_keys:
+                    # this new key is double an existing key, the solver is done
+                    self.done()
+                    return
+            found_keys.add(key)
             self.possibility(key, reverse_vigenere(text, shifts))
         self.done()
 
