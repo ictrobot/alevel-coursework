@@ -1,4 +1,5 @@
 import tkinter as tk
+import multiprocessing
 
 from ciphers.affine import AffineDecrypt, AffineEncrypt
 from ciphers.caesar import CaesarDecrypt, CaesarEncrypt
@@ -110,5 +111,7 @@ class MainMenu(tk.Frame):
 
 
 if __name__ == "__main__":
+    # Setup multiprocessing if built as an executable
+    multiprocessing.freeze_support()
     # Only start the program when this file is run, not when it is imported.
     Application().mainloop()
