@@ -1,5 +1,7 @@
 import math
 import os
+from utilities import letters_only_uppercase
+
 
 # get the ngram data folder
 NGRAM_DATA_PATH = os.path.dirname(os.path.realpath(__file__)) + "/ngram_data/"
@@ -52,19 +54,22 @@ class NgramData:
     def rate(self, text):
         """Rate how close to English text some text is. Score of 0 is closest to English text."""
         # strip all non letter characters
-        letters = ""
-        for letter in text.upper():
-            if 65 <= ord(letter) <= 90:
-                letters += letter
+        letters = letters_only_uppercase(text)
         # check it is at least n long
         if len(letters) < self.n:
             return 0
         # calculate the total score and the number of patterns
         total_score = 0
         num_patterns = len(letters) - self.n + 1
+        # cache variables in local scope to speed up access
+        n = self.n
+        scores = self.scores
+        score_other = self.score_other
         for i in range(num_patterns):
-            key = letters[i:i+self.n]
-            total_score += self.get_score(key)
+            try:
+                total_score += scores[letters[i:i+n]]
+            except KeyError:
+                total_score += score_other
         # calculate the average score
         average_score = total_score / num_patterns
         # return how close the average_score of the text is to the average score of the dataset.
