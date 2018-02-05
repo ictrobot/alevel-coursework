@@ -16,10 +16,16 @@ DUPLICATE_MAPPING_COLOR = "red"
 
 def substitution(text, mapping):
     """Performs Substitution cipher on the input text. mapping should be a dictionary containing input_letter:output_letter"""
-    text = text.upper()
-    for k, v in mapping.items():
-        text = text.replace(k.upper(), v.lower())
-    return text
+    translation = {}
+    for upper, upper_chr, lower_chr in zip(ascii_uppercase, range(65, 91), range(97, 123)):
+        try:
+            value = mapping[upper].lower()
+            translation[upper_chr] = value
+            translation[lower_chr] = value
+        except KeyError:
+            translation[upper_chr] = upper
+            translation[lower_chr] = upper
+    return text.translate(translation)
 
 
 def valid_mapping_entry(text):
