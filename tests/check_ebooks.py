@@ -12,6 +12,7 @@ from solvers.caesar import CaesarSolver, caesar
 from solvers.scytale import ScytaleSolver, scytale
 from solvers.substitution import SubstitutionSolver, substitution
 from solvers.vigenere import VigenereSolver, string_to_shifts, vigenere
+from utilities import letters_only_uppercase
 
 
 class SolverChecker:
@@ -138,10 +139,7 @@ def get_strings(full_path):
     """ loads a file and returns a list of 10000 long strings """
     texts = []
     with open(full_path, "r", encoding="utf-8") as f:
-        letters = ""
-        for letter in f.read().upper():
-            if 65 <= ord(letter) <= 90:
-                letters += letter
+        letters = letters_only_uppercase(f.read())
         for i in range(0, len(letters), 10000):
             string = letters[i:i + 10000]
             if len(string) == 10000:

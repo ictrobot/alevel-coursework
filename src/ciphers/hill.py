@@ -5,7 +5,7 @@ from string import ascii_uppercase
 import numpy
 
 from cipher_window import CipherWindow
-from utilities import mod_inverse, greatest_common_divisor
+from utilities import mod_inverse, greatest_common_divisor, letters_only_uppercase
 from widgets.numentry import NumEntry
 from widgets.matrixentry import MatrixEntry
 
@@ -18,10 +18,7 @@ def hill(text, key, pad="Z"):
     if key_rows != key_columns:
         raise ValueError("Key must be a square matrix")
     # strip all non letter characters
-    message = ""
-    for letter in text.upper():
-        if 65 <= ord(letter) <= 90:
-            message += letter
+    message = letters_only_uppercase(text)
     # check if pad is an uppercase letter
     if pad not in ascii_uppercase or len(pad) != 1:
         raise ValueError("Pad must be an uppercase letter")

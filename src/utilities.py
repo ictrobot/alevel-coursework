@@ -1,6 +1,19 @@
+from collections import defaultdict
+from string import ascii_letters
+
 # The options to be passed into a tkinter label to make it look like a title.
 TITLE_LABEL_OPTIONS = {"font": (None, 20)}
 SUBTITLE_LABEL_OPTIONS = {"font": (None, 14)}
+
+# build letters only mapping
+string_uppercase_strip_mapping = defaultdict(lambda: None)
+for letter in ascii_letters:
+    string_uppercase_strip_mapping[ord(letter)] = letter.upper()
+
+
+def letters_only_uppercase(text):
+    """Converts the text to uppercase and strips any non-letter characters"""
+    return text.translate(string_uppercase_strip_mapping)
 
 
 def greatest_common_divisor(a, b):
