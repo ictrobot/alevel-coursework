@@ -1,9 +1,6 @@
 from solvers.solver_process import SolverProcess
 from ciphers.affine import *
 
-# store all the possible values of A (where a & 26 have a modular inverse)
-POSSIBLE_VALUES_A = [i for i in range(1, 25) if mod_inverse(i, 26) is not None]
-
 
 class AffineSolver(SolverProcess):
     """ Automatic key finder for the Affine Cipher"""
