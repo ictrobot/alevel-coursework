@@ -1,24 +1,26 @@
 from solvers.solver_process import SolverProcess
 from ciphers.vigenere import *
+from ciphers.caesar import caesar
 from ngrams import get_ngram_data
 from string import ascii_uppercase
+from utilities import letters_only_uppercase
 import itertools
 
 
-def letter_reverse_caesar(letter, key_letter):
-    """Performs the reverse of the caesar cipher on a single letter """
-    index = ord(letter) - 65
-    index -= ord(key_letter) - 65
-    return chr(65 + (index % 26))
+# cache the two gram data locally
+bigram_data = get_ngram_data(2)
+bigram_scores = {}
+for letter1 in ascii_uppercase:
+    for letter2 in ascii_uppercase:
+        # store the key as a tuple to avoid having to concatenate the two letters repeatedly in the solver
+        bigram_scores[letter1, letter2] = bigram_data.get_score(letter1 + letter2)
 
 
-def best_n_long_key(cipher_text, key_len):
+def best_n_long_key(cipher_text, reverse_caesars, key_len):
     """ Finds the best key for the ciphertext which is `key_len` long """
 
     # array to store the best two keys for each position
     key_possibilities = [[] for _ in range(key_len)]
-    # get the 2gram data
-    bigram_data = get_ngram_data(2)
     # for each position in the key
     for key_index in range(key_len):
         # store the best average score and keys
@@ -29,12 +31,16 @@ def best_n_long_key(cipher_text, key_len):
             # try every possible pair of keys
             total_score = 0
             count = 0
+            # get the corresponding reverse caesar string for two keys
+            string_a = reverse_caesars[key1]
+            string_b = reverse_caesars[key2]
             for text_idx in range(key_index, len(cipher_text) - 1, key_len):
                 # for every position which this key index would apply to the
                 # ciphertext, decrypt the letters and rate the result
-                letter_a = letter_reverse_caesar(cipher_text[text_idx], key1)
-                letter_b = letter_reverse_caesar(cipher_text[text_idx + 1], key2)
-                total_score += bigram_data.get_score(letter_a + letter_b)
+                letter_a = string_a[text_idx]  # use the pre-calculated reverse caesars
+                letter_b = string_b[text_idx + 1]
+                # used the cached local ngram data, avoid having to concatenate the letters
+                total_score += bigram_scores[letter_a, letter_b]
                 count += 1
             # work out the average score using the key1 key2 pair
             average = total_score / count
@@ -69,20 +75,21 @@ class VigenereSolver(SolverProcess):
     def run(self, text):
         """ Run the automatic key finding """
         # strip all non letter characters
-        letters_only = ""
-        for letter in text.upper():
-            if 65 <= ord(letter) <= 90:
-                letters_only += letter
+        letters_only = letters_only_uppercase(text)
         # all the possible lengths to test
         lengths = list(range(2, min(50, len(letters_only))))
         # set the number of possibilities
         self.set_total_possibilities(len(lengths))
+        # pre-calculate the entire text decrypted with all the caesar shifts
+        reverse_caesars = {}
+        for shift, letter in enumerate(ascii_uppercase):
+            reverse_caesars[letter] = caesar(letters_only, -shift)
         # store the found keys
         found_keys = set()
         # iterate over each length to check
         for length in lengths:
             # try and find the best key that is `length` long
-            key = best_n_long_key(letters_only, length)
+            key = best_n_long_key(letters_only, reverse_caesars, length)
             shifts = string_to_shifts(key)
             # check if key is double an existing key
             if len(key) % 2 == 0:

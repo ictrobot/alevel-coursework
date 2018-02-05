@@ -21,12 +21,14 @@ def vigenere(text, shifts):
 
     if len(shifts) == 0:
         raise ValueError("Must be at least one shift")
-
-    output = ""
+    # convert the input text into a list of character codes. map is used to run
+    # ord on each character in the text, and then this is converted into a list
+    chr_code_list = list(map(ord, text))
+    # store the length of the shifts array to reduce the number of calls to len()
+    shifts_length = len(shifts)
     # the index of the next shift to use
     shift_index = 0
-    for letter in text:
-        chr_code = ord(letter)
+    for i, chr_code in enumerate(chr_code_list):
         if 65 <= chr_code <= 90:
             # upper case letters
             offset = 65
@@ -35,15 +37,16 @@ def vigenere(text, shifts):
             offset = 97
         else:
             # leave other characters untouched
-            output += letter
             continue
         index = chr_code - offset
         index += shifts[shift_index]
         chr_code = offset + (index % 26)
-        output += chr(chr_code)
+        chr_code_list[i] = chr_code
         # update the shift for the next letter
-        shift_index = (shift_index + 1) % len(shifts)
-    return output
+        shift_index = (shift_index + 1) % shifts_length
+    # convert the character code list back into a string. map is used to convert
+    # each character code back into a character, which is then joined into a string
+    return "".join(map(chr, chr_code_list))
 
 
 def reverse_vigenere(text, shifts):
