@@ -1,6 +1,6 @@
 import unittest
 
-from utilities import extended_euclidean, greatest_common_divisor, mod_inverse
+from utilities import extended_euclidean, greatest_common_divisor, mod_inverse, letters_only_uppercase
 
 
 class TestUtilities(unittest.TestCase):
@@ -25,3 +25,13 @@ class TestUtilities(unittest.TestCase):
         self.assertEqual(mod_inverse(26, 8), None)
         self.assertEqual(mod_inverse(5, 18), 11)
         self.assertEqual(mod_inverse(12, 3), None)
+
+    def test_letters_only_uppercase(self):
+        self.assertEqual(letters_only_uppercase("abcd"), "ABCD")
+        self.assertEqual(letters_only_uppercase("ab 123 cd"), "ABCD")
+
+        self.assertEqual(letters_only_uppercase("Hello World"), "HELLOWORLD")
+        self.assertEqual(letters_only_uppercase("h0e0l0l0o0W0o0r0l0d0"), "HELLOWORLD")
+
+        self.assertEqual(letters_only_uppercase("1243!@£$"), "")
+        self.assertEqual(letters_only_uppercase(""), "")
